@@ -8,6 +8,8 @@ export interface userDocument extends Document {
     avatar?: string | null,
     createdAt: Date,
     updatedAt: Date
+
+    comparePassword(value:string): Promise<boolean>
 }
 
 const UserSchema = new Schema<userDocument>(
