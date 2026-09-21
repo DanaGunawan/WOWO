@@ -24,7 +24,7 @@ const messageSchema = new Schema<messageDocument>({
     },
     image: {type:String},
     content:{type:String},
-    replyTo:{Type:Schema.Types.ObjectId,ref:'user',default:null}
+    replyTo:{type:Schema.Types.ObjectId,ref:'user',default:null}
 })
 
 

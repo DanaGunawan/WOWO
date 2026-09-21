@@ -10,6 +10,7 @@ import { errorHandler } from "./middlewares/errorHandler.Middleware";
 import DatabaseConnection from "./config/database.config";
 
 import "./config/passport.config";
+import routes from "./routes/index.route";
 
 const app = express();
 app.use(express.json());
@@ -32,6 +33,8 @@ app.get('/health', AsyncHandler(async (req:Request, res:Response) => {
         statusCode: "OK"
     });
 }));
+
+app.use('/api/v1', routes);
 
 app.listen(Env.PORT, async () => {
   await DatabaseConnection()
