@@ -2,6 +2,7 @@ import chatModel from "../models/chat.model";
 import userModel from "../models/user.model";
 import messageModel from "../models/message.model";
 import { badRequestException, notFound } from "../utils/error-app";
+import { emitNewChatParticipants } from "../lib/socket";
 
 export const createChatService = async (
   userId: string,
@@ -33,7 +34,7 @@ export const createChatService = async (
     allParticipantsIds = [userId, participantId];
     const existingChat = chatModel
       .findOne({
-        participans: allParticipantsIds,
+        participants: allParticipantsIds,
         $size: 2,
       })
       .populate("participants", "name avatar");
@@ -47,6 +48,12 @@ export const createChatService = async (
     });
 
     //implemend web socket
+    const populatedChat = await chat?.populate("participants", "name avatar")
+    const participantIdStrings = populatedChat?.participants?.map((p) => {
+      return p._id.toString()
+    })
+
+    emitNewChatParticipants(participantIdStrings,populatedChat)
     return chat;
   }
 };
@@ -98,5 +105,21 @@ export const getSingleChatService = async(chatId: string, userId: string) => {
         messages,
         chat
     }
-
 }
+
+    export const validateChatParticipant = async(
+      chatId : string,
+      userId : string
+    ) => {
+
+      const chat = await chatModel.findOne({
+        id: chatId,
+        participants: 
+        {
+          $ne : userId
+        }
+      })
+
+      if(!chat) return new badRequestException('user not participant in a chat')
+      return chat;
+    }
