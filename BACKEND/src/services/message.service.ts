@@ -2,6 +2,8 @@ import messageModel from "../models/message.model";
 import chatModel from "../models/chat.model";
 import { badRequestException, notFound } from "../utils/error-app";
 import cloudinary from "../config/cloudinary.config";
+import mongoose from "mongoose";
+import {emitNewMessageToChatRoom, emitLastMessageToParticipants} from "../lib/socket"
 
 export const sendMessageService = async (
   userId: string,
@@ -53,8 +55,17 @@ export const sendMessageService = async (
       }
     },
   ]);
+  
+  chat.lastMessage = newMessage._id as mongoose.Types.ObjectId
+  await chat.save()
 
-  //websocket
+  //websocket 
+  //emit the new chat to the room
+  emitNewMessageToChatRoom(userId, chatId, newMessage)
+
+  //group chat last message
+  const allParticipantsId = chat.participants.map((id) => id.toString())
+  emitLastMessageToParticipants(allParticipantsId, chatId, newMessage)
 
   return {userMessage: newMessage, chat}
 };

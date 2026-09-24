@@ -87,17 +87,46 @@ export const initializeSocket = (httpServer: HttpServer) => {
   });
 };
 
-function getIO(){
-    if(!io) throw new Error("socket io not initialized")
-    return io
+function getIO() {
+  if (!io) throw new Error("socket io not initialized");
+  return io;
 }
 
 export const emitNewChatParticipants = (
-    participantsIds : string[] = [],
-    chat:any
+  participantsIds: string[] = [],
+  chat: any,
 ) => {
-    const io = getIO()
-    for (const participantId of participantsIds){
-        io.to(`user participant: ${participantId}`).emit("chat:new",chat)
-    }
+  const io = getIO();
+  for (const participantId of participantsIds) {
+    io.to(`user participant: ${participantId}`).emit("chat:new", chat);
+  }
+};
+
+export const emitLastMessageToParticipants = (
+  allParticipantsIds: string[],
+  chatId: string,
+  lastMessage: any,
+) => {
+const io = getIO();
+const payload = {chatId,lastMessage};
+
+for (const participantId of allParticipantsIds){
+  io.to(`user participant: ${participantId}`).emit('chat:update',payload)
 }
+};
+
+
+export const emitNewMessageToChatRoom = (
+  senderId: string,
+  chatId: string,
+  message: any,
+) => {
+  const io = getIO();
+  const senderSocketId = onlineUser.get(senderId);
+
+  if (senderSocketId) {
+    io.to(`chat: ${chatId}`).except(senderSocketId).emit("message:new", message);
+  } else {
+    io.to(`chat: ${chatId}`).emit("message:new", message);
+  }
+};
