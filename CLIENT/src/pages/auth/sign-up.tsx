@@ -15,11 +15,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Spinner } from "@/components/ui/spinner";
 import { Link } from "react-router-dom";
+import { authRoutes } from "@/routes/routes";
 
-const SignUp = () => {
-  const { register, isSigningUp } = useAuth();
 
-  const formSchema = z.object({
+const formSchema = z.object({
     name: z.string().trim().min(1, "name is required"),
     email: z
       .string()
@@ -33,6 +32,10 @@ const SignUp = () => {
       .min(1, "password is required"),
     avatar: z.string().optional(),
   });
+
+
+const SignUp = () => {
+  const { register, isSigningUp } = useAuth();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -70,7 +73,6 @@ const SignUp = () => {
                     <FormItem>
                       <FormLabel>name</FormLabel>
                       <FormControl>
-                        {" "}
                         <Input
                           type="text"
                           placeholder="Rudy Gunawan"
@@ -88,7 +90,6 @@ const SignUp = () => {
                     <FormItem>
                       <FormLabel>email</FormLabel>
                       <FormControl>
-                        {" "}
                         <Input
                           type="email"
                           placeholder="rudygunawan@gmail.com"
@@ -106,7 +107,6 @@ const SignUp = () => {
                     <FormItem>
                       <FormLabel>password</FormLabel>
                       <FormControl>
-                        {" "}
                         <Input
                           type="password"
                           placeholder="*********"
@@ -122,8 +122,8 @@ const SignUp = () => {
                 </Button>
 
                 <div className="text-center text-sm">
-                  Already Have an Account?{" "}
-                  <Link to="/" className="underline">
+                  Already Have an Account?
+                  <Link to={authRoutes.SIGN_IN} className="underline">
                     Sign in
                   </Link>
                 </div>
